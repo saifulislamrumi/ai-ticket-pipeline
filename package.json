@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node dist/api/index.js",
     "dev": "tsx watch src/api/index.ts",
-    "migrate": "tsx migrations/run.ts",
+    "migrate": "tsx migrations/run.js",
     "worker:phase1": "tsx src/workers/phase1Worker.ts",
     "worker:phase2": "tsx src/workers/phase2Worker.ts",
     "worker:dlq": "tsx src/workers/dlqMonitor.ts",
