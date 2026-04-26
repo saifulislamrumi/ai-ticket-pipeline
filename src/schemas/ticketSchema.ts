@@ -1,3 +1,4 @@
+// src/schemas/ticketSchema.ts
 import { z } from 'zod';
 
 export const ticketSchema = z.object({
@@ -5,3 +6,5 @@ export const ticketSchema = z.object({
   subject:  z.string().min(1, 'Subject is required'),
   body:     z.string().min(10, 'Body must be at least 10 characters'),
 });
+
+export type TicketInput = z.infer<typeof ticketSchema>;

@@ -1,3 +1,4 @@
+// src/db/pool.ts
 import pg from 'pg';
 import { config } from '../config/index.js';
 

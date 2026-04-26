@@ -1,19 +1,22 @@
+// src/repositories/TicketPhaseRepository.ts
+import { type Pool } from 'pg';
 import { pool } from '../db/pool.js';
+import type { InsertPhaseData, PhaseRow, UpdatePhaseFields, Phase } from '../types/index.js';
 
 class TicketPhaseRepository {
-  async insert({ ticketId, phase }) {
-    const result = await pool.query(
+  constructor(private readonly pool: Pool) {}
+
+  async insert({ ticketId, phase }: InsertPhaseData): Promise<void> {
+    await this.pool.query(
       `INSERT INTO ticket_phases (ticket_id, phase) VALUES ($1, $2)
-       ON CONFLICT (ticket_id, phase) DO NOTHING
-       RETURNING id`,
-      [ticketId, phase]
+       ON CONFLICT (ticket_id, phase) DO NOTHING`,
+      [ticketId, phase],
     );
-    return result.rows[0];
   }
 
-  async update(ticketId, phase, fields) {
-    const sets   = [];
-    const values = [];
+  async update(ticketId: string, phase: Phase, fields: UpdatePhaseFields): Promise<void> {
+    const sets:   string[] = [];
+    const values: unknown[] = [];
     let i = 1;
 
     if (fields.status      !== undefined) { sets.push(`status = $${i++}`);       values.push(fields.status); }
@@ -25,27 +28,27 @@ class TicketPhaseRepository {
     if (sets.length === 0) return;
 
     values.push(ticketId, phase);
-    await pool.query(
+    await this.pool.query(
       `UPDATE ticket_phases SET ${sets.join(', ')} WHERE ticket_id = $${i++} AND phase = $${i++}`,
-      values
+      values,
     );
   }
 
-  async findByTicket(ticketId, phase) {
-    const result = await pool.query(
+  async findByTicket(ticketId: string, phase: Phase): Promise<PhaseRow | null> {
+    const result = await this.pool.query<PhaseRow>(
       `SELECT * FROM ticket_phases WHERE ticket_id = $1 AND phase = $2`,
-      [ticketId, phase]
+      [ticketId, phase],
     );
     return result.rows[0] ?? null;
   }
 
-  async findAllByTicket(ticketId) {
-    const result = await pool.query(
+  async findAllByTicket(ticketId: string): Promise<PhaseRow[]> {
+    const result = await this.pool.query<PhaseRow>(
       `SELECT * FROM ticket_phases WHERE ticket_id = $1`,
-      [ticketId]
+      [ticketId],
     );
     return result.rows;
   }
 }
 
-export const ticketPhaseRepository = new TicketPhaseRepository();
+export const ticketPhaseRepository = new TicketPhaseRepository(pool);

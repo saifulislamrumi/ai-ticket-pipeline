@@ -1,3 +1,4 @@
+// src/schemas/phase1Schema.ts
 import { z } from 'zod';
 
 export const phase1Schema = z.object({
@@ -8,3 +9,5 @@ export const phase1Schema = z.object({
   routingTarget: z.enum(['tier1', 'tier2', 'billing_team', 'engineering', 'account_management']),
   summary:       z.string().min(10).max(300),
 });
+
+export type Phase1Output = z.infer<typeof phase1Schema>;

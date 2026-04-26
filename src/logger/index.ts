@@ -1,3 +1,4 @@
+// src/logger/index.ts
 import pino from 'pino';
 import { config } from '../config/index.js';
 
