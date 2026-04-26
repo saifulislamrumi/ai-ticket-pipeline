@@ -1,15 +1,15 @@
 // src/workers/phase1Worker.ts
 import { type Message } from '@aws-sdk/client-sqs';
-import { config } from '../config/index.js';
-import logger from '../logger/index.js';
-import { sqsClient } from '../queue/sqsClient.js';
-import { ticketRepository } from '../repositories/TicketRepository.js';
-import { ticketPhaseRepository } from '../repositories/TicketPhaseRepository.js';
-import { ticketEventRepository } from '../repositories/TicketEventRepository.js';
-import { calcDelay } from '../utils/backoff.js';
-import { ZodValidationError } from '../utils/ZodValidationError.js';
-import { triageService } from '../services/triageService.js';
-import type { SQSMessageBody } from '../types/index.js';
+import { config } from '../config/index.ts';
+import logger from '../logger/index.ts';
+import { sqsClient } from '../queue/sqsClient.ts';
+import { ticketRepository } from '../repositories/TicketRepository.ts';
+import { ticketPhaseRepository } from '../repositories/TicketPhaseRepository.ts';
+import { ticketEventRepository } from '../repositories/TicketEventRepository.ts';
+import { calcDelay } from '../utils/backoff.ts';
+import { ZodValidationError } from '../utils/ZodValidationError.ts';
+import { triageService } from '../services/triageService.ts';
+import type { SQSMessageBody } from '../types/index.ts';
 
 class Phase1Worker {
   private shuttingDown = false;

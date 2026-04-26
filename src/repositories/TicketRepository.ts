@@ -1,7 +1,7 @@
 // src/repositories/TicketRepository.ts
 import { type Pool } from 'pg';
-import { pool } from '../db/pool.js';
-import type { InsertTicketData, TicketRow, TicketStatus } from '../types/index.js';
+import { pool } from '../db/pool.ts';
+import type { InsertTicketData, TicketRow, TicketStatus } from '../types/index.ts';
 
 class TicketRepository {
   constructor(private readonly pool: Pool) {}

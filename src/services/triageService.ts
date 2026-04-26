@@ -1,9 +1,9 @@
 // src/services/triageService.ts
-import { aiGateway } from './aiGateway.js';
-import { buildPhase1Prompt } from '../prompts/phase1Prompt.js';
-import { phase1Schema, type Phase1Output } from '../schemas/phase1Schema.js';
-import { ZodValidationError } from '../utils/ZodValidationError.js';
-import type { TicketRow } from '../types/index.js';
+import { aiGateway } from './aiGateway.ts';
+import { buildPhase1Prompt } from '../prompts/phase1Prompt.ts';
+import { phase1Schema, type Phase1Output } from '../schemas/phase1Schema.ts';
+import { ZodValidationError } from '../utils/ZodValidationError.ts';
+import type { TicketRow } from '../types/index.ts';
 
 class TriageService {
   async triage(ticket: TicketRow): Promise<{ result: Phase1Output; provider: string }> {

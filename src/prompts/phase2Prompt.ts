@@ -1,5 +1,5 @@
 // src/prompts/phase2Prompt.ts
-import type { ChatMessage, TicketRow } from '../types/index.js';
+import type { ChatMessage, TicketRow } from '../types/index.ts';
 
 export function buildPhase2Prompt(ticket: TicketRow, phase1Result: unknown): ChatMessage[] {
   return [

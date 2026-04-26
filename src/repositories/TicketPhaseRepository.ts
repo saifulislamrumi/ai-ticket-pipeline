@@ -1,7 +1,7 @@
 // src/repositories/TicketPhaseRepository.ts
 import { type Pool } from 'pg';
-import { pool } from '../db/pool.js';
-import type { InsertPhaseData, PhaseRow, UpdatePhaseFields, Phase } from '../types/index.js';
+import { pool } from '../db/pool.ts';
+import type { InsertPhaseData, PhaseRow, UpdatePhaseFields, Phase } from '../types/index.ts';
 
 class TicketPhaseRepository {
   constructor(private readonly pool: Pool) {}

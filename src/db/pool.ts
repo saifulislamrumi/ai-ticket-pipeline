@@ -1,6 +1,6 @@
 // src/db/pool.ts
 import pg from 'pg';
-import { config } from '../config/index.js';
+import { config } from '../config/index.ts';
 
 const { Pool } = pg;
 

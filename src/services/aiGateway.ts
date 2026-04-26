@@ -1,7 +1,7 @@
 // src/services/aiGateway.ts
 import { Portkey } from 'portkey-ai';
-import { config } from '../config/index.js';
-import type { AIProvider, AIMetadata, AIResponse, ChatMessage } from '../types/index.js';
+import { config } from '../config/index.ts';
+import type { AIProvider, AIMetadata, AIResponse, ChatMessage } from '../types/index.ts';
 
 class AIGateway {
   private readonly providers: AIProvider[];

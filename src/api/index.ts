@@ -1,10 +1,10 @@
 // src/api/index.ts
 import express from 'express';
 import { createServer } from 'http';
-import { config } from '../config/index.js';
-import logger from '../logger/index.js';
-import healthRouter from '../routes/health.js';
-import ticketsRouter from '../routes/tickets.js';
+import { config } from '../config/index.ts';
+import logger from '../logger/index.ts';
+import healthRouter from '../routes/health.ts';
+import ticketsRouter from '../routes/tickets.ts';
 
 const app = express();
 app.use(express.json());

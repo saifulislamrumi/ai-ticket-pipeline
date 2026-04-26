@@ -1,9 +1,9 @@
 // src/services/resolutionService.ts
-import { aiGateway } from './aiGateway.js';
-import { buildPhase2Prompt } from '../prompts/phase2Prompt.js';
-import { phase2Schema, type Phase2Output } from '../schemas/phase2Schema.js';
-import { ZodValidationError } from '../utils/ZodValidationError.js';
-import type { TicketRow } from '../types/index.js';
+import { aiGateway } from './aiGateway.ts';
+import { buildPhase2Prompt } from '../prompts/phase2Prompt.ts';
+import { phase2Schema, type Phase2Output } from '../schemas/phase2Schema.ts';
+import { ZodValidationError } from '../utils/ZodValidationError.ts';
+import type { TicketRow } from '../types/index.ts';
 
 class ResolutionService {
   async generateResolution(ticket: TicketRow, phase1Result: unknown): Promise<{ result: Phase2Output; provider: string }> {

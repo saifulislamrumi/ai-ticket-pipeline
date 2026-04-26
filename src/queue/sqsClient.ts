@@ -7,7 +7,7 @@ import {
   type Message,
   type QueueAttributeName,
 } from '@aws-sdk/client-sqs';
-import { config } from '../config/index.js';
+import { config } from '../config/index.ts';
 
 class SQSQueueClient {
   private readonly client: SQSClient;

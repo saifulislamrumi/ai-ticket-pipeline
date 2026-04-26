@@ -1,11 +1,11 @@
 // src/workers/dlqMonitor.ts
 import { type Message } from '@aws-sdk/client-sqs';
-import { config } from '../config/index.js';
-import logger from '../logger/index.js';
-import { sqsClient } from '../queue/sqsClient.js';
-import { ticketRepository } from '../repositories/TicketRepository.js';
-import { ticketEventRepository } from '../repositories/TicketEventRepository.js';
-import type { Phase, SQSMessageBody } from '../types/index.js';
+import { config } from '../config/index.ts';
+import logger from '../logger/index.ts';
+import { sqsClient } from '../queue/sqsClient.ts';
+import { ticketRepository } from '../repositories/TicketRepository.ts';
+import { ticketEventRepository } from '../repositories/TicketEventRepository.ts';
+import type { Phase, SQSMessageBody } from '../types/index.ts';
 
 class DLQMonitor {
   private shuttingDown = false;

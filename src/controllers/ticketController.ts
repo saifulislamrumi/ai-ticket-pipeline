@@ -1,14 +1,14 @@
 // src/controllers/ticketController.ts
 import { type Request, type Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { ticketSchema } from '../schemas/ticketSchema.js';
-import { ticketRepository } from '../repositories/TicketRepository.js';
-import { ticketPhaseRepository } from '../repositories/TicketPhaseRepository.js';
-import { ticketEventRepository } from '../repositories/TicketEventRepository.js';
-import { sqsClient } from '../queue/sqsClient.js';
-import { config } from '../config/index.js';
-import logger from '../logger/index.js';
-import type { PhaseView, EventView, StatusResponse } from '../types/index.js';
+import { ticketSchema } from '../schemas/ticketSchema.ts';
+import { ticketRepository } from '../repositories/TicketRepository.ts';
+import { ticketPhaseRepository } from '../repositories/TicketPhaseRepository.ts';
+import { ticketEventRepository } from '../repositories/TicketEventRepository.ts';
+import { sqsClient } from '../queue/sqsClient.ts';
+import { config } from '../config/index.ts';
+import logger from '../logger/index.ts';
+import type { PhaseView, EventView, StatusResponse } from '../types/index.ts';
 
 type ParamRequest = Request<{ taskId: string }>;
 
