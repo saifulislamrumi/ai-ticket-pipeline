@@ -8,7 +8,7 @@ import { ticketPhaseRepository } from '../repositories/TicketPhaseRepository.js'
 import { ticketEventRepository } from '../repositories/TicketEventRepository.js';
 import { calcDelay } from '../utils/backoff.js';
 import { ZodValidationError } from '../utils/ZodValidationError.js';
-import { triage } from '../services/triageService.js';
+import { triageService } from '../services/triageService.js';
 import type { SQSMessageBody } from '../types/index.js';
 
 class Phase1Worker {
@@ -60,7 +60,7 @@ class Phase1Worker {
     const startedAt = Date.now();
 
     try {
-      const { result, provider } = await triage(ticket);
+      const { result, provider } = await triageService.triage(ticket);
       const latencyMs = Date.now() - startedAt;
 
       await ticketPhaseRepository.update(taskId, 'phase1', {

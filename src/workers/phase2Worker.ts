@@ -8,7 +8,7 @@ import { ticketPhaseRepository } from '../repositories/TicketPhaseRepository.js'
 import { ticketEventRepository } from '../repositories/TicketEventRepository.js';
 import { calcDelay } from '../utils/backoff.js';
 import { ZodValidationError } from '../utils/ZodValidationError.js';
-import { generateResolution } from '../services/resolutionService.js';
+import { resolutionService } from '../services/resolutionService.js';
 import type { SQSMessageBody } from '../types/index.js';
 
 class Phase2Worker {
@@ -68,7 +68,7 @@ class Phase2Worker {
     const startedAt = Date.now();
 
     try {
-      const { result, provider } = await generateResolution(ticket, phase1Result);
+      const { result, provider } = await resolutionService.generateResolution(ticket, phase1Result);
       const latencyMs = Date.now() - startedAt;
 
       await ticketPhaseRepository.update(taskId, 'phase2', {

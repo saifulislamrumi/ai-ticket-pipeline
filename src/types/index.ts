@@ -64,6 +64,32 @@ export interface InsertEventData {
   payload?:  Record<string, unknown>;
 }
 
+// ── AI gateway types ──────────────────────────────────────────────────────
+export interface AIProvider {
+  key:   string;
+  model: string;
+}
+
+export interface AIMetadata {
+  ticketId: string;
+  phase:    string;
+}
+
+export interface ChatMessage {
+  role:    'system' | 'user' | 'assistant';
+  content: string;
+}
+
+export interface AIResponse {
+  model?: string;
+  choices: Array<{
+    message: {
+      content: string | null;
+      role:    string;
+    };
+  }>;
+}
+
 // ── SQS message body ──────────────────────────────────────────────────────
 export interface SQSMessageBody {
   taskId: string;

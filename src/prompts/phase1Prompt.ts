@@ -1,4 +1,7 @@
-export function buildPhase1Prompt(ticket) {
+// src/prompts/phase1Prompt.ts
+import type { ChatMessage, TicketRow } from '../types/index.js';
+
+export function buildPhase1Prompt(ticket: TicketRow): ChatMessage[] {
   return [
     {
       role: 'system',
