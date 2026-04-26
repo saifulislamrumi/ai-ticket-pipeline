@@ -1,3 +1,5 @@
+// src/controllers/ticketController.ts
+import { type Request, type Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { ticketSchema } from '../schemas/ticketSchema.js';
 import { ticketRepository } from '../repositories/TicketRepository.js';
@@ -6,8 +8,11 @@ import { ticketEventRepository } from '../repositories/TicketEventRepository.js'
 import { sendMessage } from '../queue/sqsClient.js';
 import { config } from '../config/index.js';
 import logger from '../logger/index.js';
+import type { PhaseView, EventView, StatusResponse } from '../types/index.js';
 
-export async function submit(req, res) {
+type ParamRequest = Request<{ taskId: string }>;
+
+export async function submit(req: Request, res: Response): Promise<void> {
   const parsed = ticketSchema.safeParse(req.body);
 
   if (!parsed.success) {
@@ -15,7 +20,8 @@ export async function submit(req, res) {
       field:   e.path.join('.'),
       message: e.message,
     }));
-    return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'Validation failed', code: 400, fields });
+    res.status(400).json({ error: 'VALIDATION_ERROR', message: 'Validation failed', code: 400, fields });
+    return;
   }
 
   const { tenantId, subject, body } = parsed.data;
@@ -29,14 +35,15 @@ export async function submit(req, res) {
 
     log.info({ action: 'ticket_queued', tenantId }, 'Ticket accepted and enqueued to Phase 1');
 
-    return res.status(202).json({ ticketId: taskId, status: 'queued' });
+    res.status(202).json({ ticketId: taskId, status: 'queued' });
   } catch (err) {
-    log.error({ error: err.message }, 'Failed to persist ticket');
-    return res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Internal server error', code: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    log.error({ error: message }, 'Failed to persist ticket');
+    res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Internal server error', code: 500 });
   }
 }
 
-export async function getStatus(req, res) {
+export async function getStatus(req: ParamRequest, res: Response): Promise<void> {
   const { taskId } = req.params;
   const log = logger.child({ taskId });
 
@@ -44,7 +51,8 @@ export async function getStatus(req, res) {
     const ticket = await ticketRepository.findById(taskId);
 
     if (!ticket) {
-      return res.status(404).json({ error: 'NOT_FOUND', message: `Ticket ${taskId} not found`, code: 404 });
+      res.status(404).json({ error: 'NOT_FOUND', message: `Ticket ${taskId} not found`, code: 404 });
+      return;
     }
 
     const [phases, events] = await Promise.all([
@@ -52,7 +60,7 @@ export async function getStatus(req, res) {
       ticketEventRepository.findByTicket(taskId, 20),
     ]);
 
-    const phasesMap = {};
+    const phasesMap: Partial<Record<string, PhaseView>> = {};
     for (const p of phases) {
       phasesMap[p.phase] = {
         status:   p.status,
@@ -61,24 +69,27 @@ export async function getStatus(req, res) {
       };
     }
 
-    return res.status(200).json({
+    const response: StatusResponse = {
       ticketId: ticket.id,
       status:   ticket.status,
       phases:   phasesMap,
-      events:   events.map(e => ({
+      events:   events.map((e): EventView => ({
         eventType: e.event_type,
         phase:     e.phase,
         payload:   e.payload,
         createdAt: e.created_at,
       })),
-    });
+    };
+
+    res.status(200).json(response);
   } catch (err) {
-    log.error({ error: err.message }, 'Failed to fetch ticket');
-    return res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Internal server error', code: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    log.error({ error: message }, 'Failed to fetch ticket');
+    res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Internal server error', code: 500 });
   }
 }
 
-export async function replay(req, res) {
+export async function replay(req: ParamRequest, res: Response): Promise<void> {
   const { taskId } = req.params;
   const log = logger.child({ taskId });
 
@@ -86,15 +97,17 @@ export async function replay(req, res) {
     const ticket = await ticketRepository.findById(taskId);
 
     if (!ticket) {
-      return res.status(404).json({ error: 'NOT_FOUND', message: `Ticket ${taskId} not found`, code: 404 });
+      res.status(404).json({ error: 'NOT_FOUND', message: `Ticket ${taskId} not found`, code: 404 });
+      return;
     }
 
     if (ticket.status !== 'failed') {
-      return res.status(409).json({ error: 'CONFLICT', message: 'Only failed tickets can be replayed', code: 409 });
+      res.status(409).json({ error: 'CONFLICT', message: 'Only failed tickets can be replayed', code: 409 });
+      return;
     }
 
-    const phases   = await ticketPhaseRepository.findAllByTicket(taskId);
-    const phase1   = phases.find(p => p.phase === 'phase1');
+    const phases = await ticketPhaseRepository.findAllByTicket(taskId);
+    const phase1 = phases.find(p => p.phase === 'phase1');
 
     // Reset failed phases to pending, keep completed phases intact
     for (const p of phases) {
@@ -115,9 +128,10 @@ export async function replay(req, res) {
 
     log.info({ action: 'ticket_replayed' }, 'Ticket re-enqueued for replay');
 
-    return res.status(202).json({ ticketId: taskId, status: 'queued' });
+    res.status(202).json({ ticketId: taskId, status: 'queued' });
   } catch (err) {
-    log.error({ error: err.message }, 'Failed to replay ticket');
-    return res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Internal server error', code: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    log.error({ error: message }, 'Failed to replay ticket');
+    res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Internal server error', code: 500 });
   }
 }

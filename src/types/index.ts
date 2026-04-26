@@ -63,3 +63,24 @@ export interface InsertEventData {
   eventType: string;
   payload?:  Record<string, unknown>;
 }
+
+// ── API response shapes ────────────────────────────────────────────────────
+export interface PhaseView {
+  status:   PhaseStatus;
+  attempts: number;
+  output:   unknown;
+}
+
+export interface EventView {
+  eventType: string;
+  phase:     Phase | null;
+  payload:   unknown;
+  createdAt: Date;
+}
+
+export interface StatusResponse {
+  ticketId: string;
+  status:   TicketStatus;
+  phases:   Partial<Record<Phase, PhaseView>>;
+  events:   EventView[];
+}

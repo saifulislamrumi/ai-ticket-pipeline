@@ -14,11 +14,11 @@ export interface AppConfig {
   PHASE2_QUEUE_URL:            string;
   PHASE1_DLQ_URL:              string;
   PHASE2_DLQ_URL:              string;
-  PORTKEY_API_KEY:             string;
-  PORTKEY_GROQ_VIRTUAL_KEY:    string;
-  PORTKEY_ANTHROPIC_VIRTUAL_KEY: string;
-  PORTKEY_OPENAI_VIRTUAL_KEY:  string;
-  PORTKEY_GOOGLE_VIRTUAL_KEY:  string;
+  PORTKEY_API_KEY:               string;
+  PORTKEY_GROQ_VIRTUAL_KEY:      string;
+  PORTKEY_ANTHROPIC_VIRTUAL_KEY: string | undefined;
+  PORTKEY_OPENAI_VIRTUAL_KEY:    string | undefined;
+  PORTKEY_GOOGLE_VIRTUAL_KEY:    string | undefined;
   MAX_RETRY_ATTEMPTS:          number;
   RETRY_BASE_DELAY_MS:         number;
   RETRY_MAX_DELAY_MS:          number;
@@ -52,9 +52,9 @@ export const config: AppConfig = {
 
   PORTKEY_API_KEY:               requireEnv('PORTKEY_API_KEY'),
   PORTKEY_GROQ_VIRTUAL_KEY:      requireEnv('PORTKEY_GROQ_VIRTUAL_KEY'),
-  PORTKEY_ANTHROPIC_VIRTUAL_KEY: requireEnv('PORTKEY_ANTHROPIC_VIRTUAL_KEY'),
-  PORTKEY_OPENAI_VIRTUAL_KEY:    requireEnv('PORTKEY_OPENAI_VIRTUAL_KEY'),
-  PORTKEY_GOOGLE_VIRTUAL_KEY:    requireEnv('PORTKEY_GOOGLE_VIRTUAL_KEY'),
+  PORTKEY_ANTHROPIC_VIRTUAL_KEY: process.env.PORTKEY_ANTHROPIC_VIRTUAL_KEY,
+  PORTKEY_OPENAI_VIRTUAL_KEY:    process.env.PORTKEY_OPENAI_VIRTUAL_KEY,
+  PORTKEY_GOOGLE_VIRTUAL_KEY:    process.env.PORTKEY_GOOGLE_VIRTUAL_KEY,
 
   MAX_RETRY_ATTEMPTS:    parseInt(process.env.MAX_RETRY_ATTEMPTS  ?? '3',    10),
   RETRY_BASE_DELAY_MS:   parseInt(process.env.RETRY_BASE_DELAY_MS ?? '500',  10),
