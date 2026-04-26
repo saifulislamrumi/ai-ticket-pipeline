@@ -3,29 +3,36 @@
   "version": "1.0.0",
   "description": "AI-powered support ticket processing pipeline",
   "type": "module",
-  "main": "src/api/index.js",
+  "main": "dist/api/index.js",
   "scripts": {
-    "start": "node src/api/index.js",
-    "dev": "node --watch src/api/index.js",
-    "migrate": "node migrations/run.js",
-    "worker:phase1": "node src/workers/phase1Worker.js",
-    "worker:phase2": "node src/workers/phase2Worker.js",
-    "worker:dlq": "node src/workers/dlqMonitor.js",
-    "queues:create": "node scripts/createQueues.js"
+    "build": "tsc",
+    "start": "node dist/api/index.js",
+    "dev": "tsx watch src/api/index.ts",
+    "migrate": "tsx migrations/run.ts",
+    "worker:phase1": "tsx src/workers/phase1Worker.ts",
+    "worker:phase2": "tsx src/workers/phase2Worker.ts",
+    "worker:dlq": "tsx src/workers/dlqMonitor.ts",
+    "queues:create": "tsx scripts/createQueues.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.0.0",
-    "portkey-ai": "latest",
     "dotenv": "^16.0.0",
     "express": "^4.18.0",
     "pg": "^8.11.0",
     "pino": "^9.0.0",
     "pino-pretty": "^11.0.0",
+    "portkey-ai": "latest",
     "uuid": "^9.0.0",
     "zod": "^3.22.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "@types/pg": "^8.20.0",
     "jest": "^29.0.0",
-    "supertest": "^6.0.0"
+    "supertest": "^6.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
   }
 }
