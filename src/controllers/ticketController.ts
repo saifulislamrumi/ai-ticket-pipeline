@@ -5,7 +5,7 @@ import { ticketSchema } from '../schemas/ticketSchema.js';
 import { ticketRepository } from '../repositories/TicketRepository.js';
 import { ticketPhaseRepository } from '../repositories/TicketPhaseRepository.js';
 import { ticketEventRepository } from '../repositories/TicketEventRepository.js';
-import { sendMessage } from '../queue/sqsClient.js';
+import { sqsClient } from '../queue/sqsClient.js';
 import { config } from '../config/index.js';
 import logger from '../logger/index.js';
 import type { PhaseView, EventView, StatusResponse } from '../types/index.js';
@@ -31,7 +31,7 @@ export async function submit(req: Request, res: Response): Promise<void> {
   try {
     await ticketRepository.insert({ id: taskId, tenantId, subject, body });
     await ticketEventRepository.insert({ ticketId: taskId, eventType: 'queued', payload: { tenantId } });
-    await sendMessage(config.PHASE1_QUEUE_URL, { taskId });
+    await sqsClient.sendMessage(config.PHASE1_QUEUE_URL, { taskId });
 
     log.info({ action: 'ticket_queued', tenantId }, 'Ticket accepted and enqueued to Phase 1');
 
@@ -124,7 +124,7 @@ export async function replay(req: ParamRequest, res: Response): Promise<void> {
       ? config.PHASE2_QUEUE_URL
       : config.PHASE1_QUEUE_URL;
 
-    await sendMessage(targetQueue, { taskId });
+    await sqsClient.sendMessage(targetQueue, { taskId });
 
     log.info({ action: 'ticket_replayed' }, 'Ticket re-enqueued for replay');
 

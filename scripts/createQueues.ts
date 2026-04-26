@@ -1,16 +1,21 @@
-import { SQSClient, CreateQueueCommand, GetQueueAttributesCommand } from '@aws-sdk/client-sqs';
+// scripts/createQueues.ts
+import {
+  SQSClient,
+  CreateQueueCommand,
+  GetQueueAttributesCommand,
+} from '@aws-sdk/client-sqs';
 import { config } from '../src/config/index.js';
 
 const sqs = new SQSClient({
   region: config.AWS_REGION,
   credentials: {
-    accessKeyId: config.AWS_ACCESS_KEY_ID,
+    accessKeyId:     config.AWS_ACCESS_KEY_ID,
     secretAccessKey: config.AWS_SECRET_ACCESS_KEY,
   },
   endpoint: config.AWS_ENDPOINT_URL,
 });
 
-async function createQueue(name, attributes = {}) {
+async function createQueue(name: string, attributes: Record<string, string> = {}): Promise<string> {
   const res = await sqs.send(new CreateQueueCommand({
     QueueName: name,
     Attributes: {
@@ -18,16 +23,19 @@ async function createQueue(name, attributes = {}) {
       ...attributes,
     },
   }));
+  if (!res.QueueUrl) throw new Error(`Failed to create queue: ${name}`);
   console.log(`✅ Created queue: ${name} → ${res.QueueUrl}`);
   return res.QueueUrl;
 }
 
-async function getQueueArn(queueUrl) {
+async function getQueueArn(queueUrl: string): Promise<string> {
   const res = await sqs.send(new GetQueueAttributesCommand({
-    QueueUrl: queueUrl,
+    QueueUrl:       queueUrl,
     AttributeNames: ['QueueArn'],
   }));
-  return res.Attributes.QueueArn;
+  const arn = res.Attributes?.QueueArn;
+  if (!arn) throw new Error(`Failed to get ARN for queue: ${queueUrl}`);
+  return arn;
 }
 
 // Create DLQs first (needed for redrive policy ARN)

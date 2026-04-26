@@ -64,6 +64,11 @@ export interface InsertEventData {
   payload?:  Record<string, unknown>;
 }
 
+// ── SQS message body ──────────────────────────────────────────────────────
+export interface SQSMessageBody {
+  taskId: string;
+}
+
 // ── API response shapes ────────────────────────────────────────────────────
 export interface PhaseView {
   status:   PhaseStatus;
