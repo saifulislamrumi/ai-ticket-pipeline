@@ -8,7 +8,7 @@ import type { TicketRow } from '../types/index.ts';
 class TriageService {
   async triage(ticket: TicketRow): Promise<{ result: Phase1Output; provider: string }> {
     const messages = buildPhase1Prompt(ticket);
-    const response = await aiGateway.call(messages, { ticketId: ticket.id, phase: 'phase1' });
+    const { response, provider } = await aiGateway.call(messages, { ticketId: ticket.id, phase: 'phase1' });
 
     const raw = response.choices[0].message.content;
 
@@ -24,7 +24,6 @@ class TriageService {
       throw new ZodValidationError(`Phase 1 output failed schema validation: ${validation.error.message}`);
     }
 
-    const provider = aiGateway.extractProvider(response);
     return { result: validation.data, provider };
   }
 }

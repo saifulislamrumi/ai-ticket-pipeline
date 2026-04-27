@@ -65,11 +65,6 @@ export interface InsertEventData {
 }
 
 // ── AI gateway types ──────────────────────────────────────────────────────
-export interface AIProvider {
-  key:   string;
-  model: string;
-}
-
 export interface AIMetadata {
   ticketId: string;
   phase:    string;

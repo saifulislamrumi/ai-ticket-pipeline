@@ -8,7 +8,7 @@ import type { TicketRow } from '../types/index.ts';
 class ResolutionService {
   async generateResolution(ticket: TicketRow, phase1Result: unknown): Promise<{ result: Phase2Output; provider: string }> {
     const messages = buildPhase2Prompt(ticket, phase1Result);
-    const response = await aiGateway.call(messages, { ticketId: ticket.id, phase: 'phase2' });
+    const { response, provider } = await aiGateway.call(messages, { ticketId: ticket.id, phase: 'phase2' });
 
     const raw = response.choices[0].message.content;
 
@@ -24,7 +24,6 @@ class ResolutionService {
       throw new ZodValidationError(`Phase 2 output failed schema validation: ${validation.error.message}`);
     }
 
-    const provider = aiGateway.extractProvider(response);
     return { result: validation.data, provider };
   }
 }
