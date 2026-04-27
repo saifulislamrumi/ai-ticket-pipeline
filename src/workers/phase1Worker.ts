@@ -9,6 +9,8 @@ import { ticketEventRepository } from '../repositories/TicketEventRepository.ts'
 import { calcDelay } from '../utils/backoff.ts';
 import { ZodValidationError } from '../utils/ZodValidationError.ts';
 import { triageService } from '../services/triageService.ts';
+import { socketServer }  from '../socket/socketServer.ts';
+import { SOCKET_EVENTS } from '../types/index.ts';
 import type { SQSMessageBody } from '../types/index.ts';
 
 class Phase1Worker {
@@ -55,6 +57,9 @@ class Phase1Worker {
     await ticketPhaseRepository.update(taskId, 'phase1', { status: 'processing', attempts: attempt, startedAt: new Date() });
     await ticketEventRepository.insert({ ticketId: taskId, phase: 'phase1', eventType: 'phase_started', payload: { attempt } });
 
+    socketServer.emitToTicket(taskId, SOCKET_EVENTS.TICKET_RECEIVED, { status: 'processing' });
+    socketServer.emitToTicket(taskId, SOCKET_EVENTS.PHASE1_STARTED, { phase: 1, attempt });
+
     log.info({ action: 'phase_started' }, 'Phase 1 started');
 
     const startedAt = Date.now();
@@ -70,6 +75,8 @@ class Phase1Worker {
         completedAt: new Date(),
       });
       await ticketEventRepository.insert({ ticketId: taskId, phase: 'phase1', eventType: 'phase_completed', payload: { attempt, provider, latencyMs } });
+
+      socketServer.emitToTicket(taskId, SOCKET_EVENTS.PHASE1_COMPLETE, { phase: 1, result });
 
       await sqsClient.sendMessage(config.PHASE2_QUEUE_URL, { taskId });
       await sqsClient.deleteMessage(config.PHASE1_QUEUE_URL, msg.ReceiptHandle!);

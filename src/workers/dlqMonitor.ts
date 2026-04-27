@@ -5,6 +5,8 @@ import logger from '../logger/index.ts';
 import { sqsClient } from '../queue/sqsClient.ts';
 import { ticketRepository } from '../repositories/TicketRepository.ts';
 import { ticketEventRepository } from '../repositories/TicketEventRepository.ts';
+import { socketServer } from '../socket/socketServer.ts';
+import { SOCKET_EVENTS } from '../types/index.ts';
 import type { Phase, SQSMessageBody } from '../types/index.ts';
 
 class DLQMonitor {
@@ -49,6 +51,8 @@ class DLQMonitor {
 
     await ticketRepository.updateStatus(taskId, 'failed');
     await ticketEventRepository.insert({ ticketId: taskId, phase, eventType: 'dlq_routed', payload: { reason: 'max_attempts_exceeded' } });
+
+    socketServer.emitToTicket(taskId, SOCKET_EVENTS.TICKET_FAILED, { status: 'failed' });
 
     log.error({ action: 'final_outcome', outcome: 'failed' }, 'Ticket permanently failed — routed to DLQ');
   }
