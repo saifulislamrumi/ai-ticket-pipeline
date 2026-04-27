@@ -7,9 +7,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/api/index.js",
-    "dev": "tsx watch src/api/index.ts",
-    "dev:all": "concurrently --names \"API,PHASE1,PHASE2,DLQ\" --prefix-colors \"cyan,green,yellow,red\" \"npm run dev\" \"npm run worker:phase1\" \"npm run worker:phase2\" \"npm run worker:dlq\"",
-    "dev:single": "tsx watch src/main.ts",
+    "dev": "tsx watch src/main.ts",
+    "submit": "node scripts/submit.mjs",
     "migrate": "tsx migrations/run.js",
     "worker:phase1": "tsx src/workers/phase1Worker.ts",
     "worker:phase2": "tsx src/workers/phase2Worker.ts",

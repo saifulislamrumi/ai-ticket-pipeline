@@ -119,8 +119,10 @@ export interface EventView {
 }
 
 export interface StatusResponse {
-  ticketId: string;
-  status:   TicketStatus;
-  phases:   Partial<Record<Phase, PhaseView>>;
-  events:   EventView[];
+  ticketId:  string;
+  status:    TicketStatus;
+  createdAt: Date;
+  updatedAt: Date;
+  phases:    Partial<Record<string, PhaseView>>;
+  events:    EventView[];
 }

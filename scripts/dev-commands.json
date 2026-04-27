@@ -1,0 +1,36 @@
+{
+  "description": "Development commands for ai-ticket-pipeline",
+  "setup": {
+    "1_start_localstack": "uv run localstack start",
+    "2_create_queues": "npm run queues:create",
+    "3_run_migrations": "npm run migrate"
+  },
+  "start": {
+    "all_at_once": "npm run dev:all",
+    "api_only": "npm run dev",
+    "phase1_worker": "npm run worker:phase1",
+    "phase2_worker": "npm run worker:phase2",
+    "dlq_monitor": "npm run worker:dlq"
+  },
+  "stop": {
+    "kill_api": "fuser -k 3000/tcp 2>/dev/null",
+    "kill_workers": "pkill -f 'phase1Worker' 2>/dev/null; pkill -f 'phase2Worker' 2>/dev/null; pkill -f 'dlqMonitor' 2>/dev/null",
+    "kill_all": "fuser -k 3000/tcp 2>/dev/null; pkill -f 'phase1Worker' 2>/dev/null; pkill -f 'phase2Worker' 2>/dev/null; pkill -f 'dlqMonitor' 2>/dev/null"
+  },
+  "test": {
+    "submit_ticket": "curl -s -X POST http://localhost:3000/api/tickets -H 'Content-Type: application/json' -d '{\"tenantId\":\"tenant-abc\",\"subject\":\"Payment not processing\",\"body\":\"Our payment gateway has been failing for all customers since 2 hours ago.\"}' | python3 -m json.tool",
+    "check_ticket": "curl -s http://localhost:3000/api/tickets/YOUR_TICKET_ID | python3 -m json.tool",
+    "watch_phase1_logs": "tail -20 /tmp/phase1.log",
+    "watch_phase2_logs": "tail -20 /tmp/phase2.log",
+    "watch_api_logs": "tail -20 /tmp/api.log"
+  },
+  "database": {
+    "check_tickets": "psql -U rumi -d ticket_pipeline -c \"SELECT id, status FROM tickets ORDER BY created_at DESC LIMIT 5;\"",
+    "check_phases": "psql -U rumi -d ticket_pipeline -c \"SELECT phase, status, attempts FROM ticket_phases ORDER BY id DESC LIMIT 4;\"",
+    "check_events": "psql -U rumi -d ticket_pipeline -c \"SELECT event_type, phase FROM ticket_events ORDER BY created_at DESC LIMIT 10;\""
+  },
+  "quality": {
+    "typecheck": "npm run typecheck",
+    "build": "npm run build"
+  }
+}

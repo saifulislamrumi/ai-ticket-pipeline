@@ -25,6 +25,14 @@ class TicketRepository {
     return result.rows[0] ?? null;
   }
 
+  async findAll(): Promise<TicketRow[]> {
+    const result = await this.pool.query<TicketRow>(
+      `SELECT id, tenant_id, subject, body, status, created_at, updated_at
+       FROM tickets ORDER BY created_at DESC`,
+    );
+    return result.rows;
+  }
+
   async updateStatus(id: string, status: TicketStatus): Promise<void> {
     await this.pool.query(
       `UPDATE tickets SET status = $1, updated_at = NOW() WHERE id = $2`,

@@ -12,6 +12,23 @@ import type { PhaseView, EventView, StatusResponse } from '../types/index.ts';
 
 type ParamRequest = Request<{ taskId: string }>;
 
+export async function list(_req: Request, res: Response): Promise<void> {
+  try {
+    const tickets = await ticketRepository.findAll();
+    res.status(200).json({
+      tickets: tickets.map((t) => ({
+        id:         t.id,
+        status:     t.status,
+        created_at: t.created_at,
+      })),
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.error({ error: message }, 'Failed to list tickets');
+    res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Internal server error', code: 500 });
+  }
+}
+
 export async function submit(req: Request, res: Response): Promise<void> {
   const parsed = ticketSchema.safeParse(req.body);
 
@@ -60,9 +77,11 @@ export async function getStatus(req: ParamRequest, res: Response): Promise<void>
       ticketEventRepository.findByTicket(taskId, 20),
     ]);
 
+    const phaseLabel: Record<string, string> = { phase1: 'triage', phase2: 'draft' };
     const phasesMap: Partial<Record<string, PhaseView>> = {};
     for (const p of phases) {
-      phasesMap[p.phase] = {
+      const label = phaseLabel[p.phase] ?? p.phase;
+      phasesMap[label] = {
         status:   p.status,
         attempts: p.attempts,
         output:   p.output ?? null,
@@ -70,10 +89,12 @@ export async function getStatus(req: ParamRequest, res: Response): Promise<void>
     }
 
     const response: StatusResponse = {
-      ticketId: ticket.id,
-      status:   ticket.status,
-      phases:   phasesMap,
-      events:   events.map((e): EventView => ({
+      ticketId:  ticket.id,
+      status:    ticket.status,
+      createdAt: ticket.created_at,
+      updatedAt: ticket.updated_at,
+      phases:    phasesMap,
+      events:    events.map((e): EventView => ({
         eventType: e.event_type,
         phase:     e.phase,
         payload:   e.payload,

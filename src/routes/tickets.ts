@@ -1,9 +1,10 @@
 // src/routes/tickets.ts
 import { Router } from 'express';
-import { submit, getStatus, replay } from '../controllers/ticketController.ts';
+import { list, submit, getStatus, replay } from '../controllers/ticketController.ts';
 
 const router = Router();
 
+router.get('/',                list);
 router.post('/',               submit);
 router.get('/:taskId',         getStatus);
 router.post('/:taskId/replay', replay);
