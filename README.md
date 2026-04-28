@@ -29,7 +29,7 @@ Failed phases retry automatically with exponential backoff. Permanently failed t
 | Validation | Zod 3.x |
 | Logger | Pino 9.x |
 | Real-time | Socket.io 4.x |
-| Testing | Jest + Supertest |
+| Testing | Vitest + Supertest |
 
 ---
 
@@ -97,7 +97,7 @@ Creates 4 queues: `phase1Queue`, `phase1Queue-DLQ`, `phase2Queue`, `phase2Queue-
 ### 7. Start the server
 
 ```bash
-npm run dev:single
+npm run dev
 ```
 
 This starts the API + all 3 workers (Phase 1, Phase 2, DLQ monitor) in a single process — required for Socket.io to work correctly.

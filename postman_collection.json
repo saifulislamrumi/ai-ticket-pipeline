@@ -1,0 +1,180 @@
+{
+  "info": {
+    "name": "AI Ticket Pipeline",
+    "_postman_id": "ai-ticket-pipeline-collection",
+    "description": "API collection for the AI-powered support ticket processing pipeline.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Body has status ok', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json.status).to.eql('ok');",
+              "  pm.expect(json).to.have.property('timestamp');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Submit Ticket",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tenantId\": \"company-abc\",\n  \"subject\": \"Cannot log in to my account\",\n  \"body\": \"I have been trying to log in for the past hour and keep getting an error.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/tickets",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tickets"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 202', function () {",
+              "  pm.response.to.have.status(202);",
+              "});",
+              "pm.test('Body has ticketId and queued status', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('ticketId');",
+              "  pm.expect(json.status).to.eql('queued');",
+              "});",
+              "if (pm.response.code === 202) {",
+              "  const json = pm.response.json();",
+              "  pm.environment.set('ticketId', json.ticketId);",
+              "  console.log('ticketId saved:', json.ticketId);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "List All Tickets",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/tickets",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tickets"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Body has tickets array', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('tickets');",
+              "  pm.expect(json.tickets).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Ticket Status",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/tickets/{{ticketId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tickets", "{{ticketId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Body has ticketId, status, phases, events', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('ticketId');",
+              "  pm.expect(json).to.have.property('status');",
+              "  pm.expect(json).to.have.property('phases');",
+              "  pm.expect(json).to.have.property('events');",
+              "  pm.expect(json.events).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Replay Failed Ticket",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/tickets/{{ticketId}}/replay",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tickets", "{{ticketId}}", "replay"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 202 or 409', function () {",
+              "  pm.expect(pm.response.code).to.be.oneOf([202, 409]);",
+              "});",
+              "if (pm.response.code === 202) {",
+              "  pm.test('Body has queued status', function () {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.status).to.eql('queued');",
+              "  });",
+              "}",
+              "if (pm.response.code === 409) {",
+              "  pm.test('Body has CONFLICT error', function () {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.error).to.eql('CONFLICT');",
+              "  });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}

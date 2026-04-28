@@ -12,6 +12,7 @@ wheels/
 # Node.js
 node_modules/
 .env
+.env.test
 logs/
 *.log
 
