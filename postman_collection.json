@@ -47,7 +47,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"tenantId\": \"company-abc\",\n  \"subject\": \"Cannot log in to my account\",\n  \"body\": \"I have been trying to log in for the past hour and keep getting an error.\"\n}"
+          "raw": "{\n  \"tenantId\": \"tenant-001\",\n  \"subject\": \"Cannot log in to my account\",\n  \"body\": \"I have been trying to log in for the past hour and keep getting an error.\"\n}"
         },
         "url": {
           "raw": "{{baseUrl}}/api/tickets",
@@ -134,6 +134,130 @@
               "  pm.expect(json).to.have.property('events');",
               "  pm.expect(json.events).to.be.an('array');",
               "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Triage Result",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/tickets/{{ticketId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tickets", "{{ticketId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "const triage = json.phases && json.phases.triage && json.phases.triage.output;",
+              "pm.test('Triage output exists', function () {",
+              "  pm.expect(triage).to.not.be.undefined;",
+              "});",
+              "console.log('Triage Result:', JSON.stringify(triage, null, 2));",
+              "pm.visualizer.set('<h3>Triage Result</h3><pre>{{triage}}</pre>', { triage: JSON.stringify(triage, null, 2) });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Customer Reply",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/tickets/{{ticketId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tickets", "{{ticketId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "const reply = json.phases && json.phases.draft && json.phases.draft.output && json.phases.draft.output.customerReply;",
+              "pm.test('Customer reply exists', function () {",
+              "  pm.expect(reply).to.not.be.undefined;",
+              "});",
+              "console.log('Customer Reply:', reply);",
+              "pm.visualizer.set('<h3>Customer Reply</h3><p>{{reply}}</p>', { reply: reply });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Next Actions",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/tickets/{{ticketId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tickets", "{{ticketId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "const actions = json.phases && json.phases.draft && json.phases.draft.output && json.phases.draft.output.nextActions;",
+              "pm.test('Next actions exist', function () {",
+              "  pm.expect(actions).to.be.an('array');",
+              "});",
+              "console.log('Next Actions:', JSON.stringify(actions, null, 2));",
+              "pm.visualizer.set('<h3>Next Actions</h3><ul>{{#each actions}}<li>{{this}}</li>{{/each}}</ul>', { actions: actions });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Internal Note",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/tickets/{{ticketId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tickets", "{{ticketId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "const note = json.phases && json.phases.draft && json.phases.draft.output && json.phases.draft.output.internalNote;",
+              "pm.test('Internal note exists', function () {",
+              "  pm.expect(note).to.not.be.undefined;",
+              "});",
+              "console.log('Internal Note:', note);",
+              "pm.visualizer.set('<h3>Internal Note</h3><p>{{note}}</p>', { note: note });"
             ],
             "type": "text/javascript"
           }
